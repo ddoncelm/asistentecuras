@@ -139,6 +139,10 @@ html, body { height: 100%; background: var(--bg); color: var(--white); font-fami
 }
 .chip.selected { background: var(--blue); border-color: var(--blue); color: var(--white); }
 .chip:active { transform: scale(.96); }
+.chip-clasif {
+  border-color: var(--cyan) !important; color: var(--cyan) !important;
+  background: rgba(76,175,125,.08) !important; font-weight: 600;
+}
 
 .aposito-card {
   background: var(--bg3); border-radius: var(--radius);
@@ -281,6 +285,19 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .modal-close { float: right; background: var(--bg3); border: none; color: var(--gray); padding: 4px 10px; border-radius: 20px; cursor: pointer; font-size: 18px; }
 
 .hidden { display: none !important; }
+
+
+/* ── ALGORITMO ── */
+.algo-opt {
+  width: 100%; padding: 13px 16px; background: var(--bg3);
+  border: 1.5px solid rgba(255,255,255,.08); border-radius: var(--radius);
+  color: var(--white); font-family: var(--font); font-size: 13px;
+  cursor: pointer; text-align: left; display: flex;
+  align-items: center; justify-content: space-between; gap: 10px;
+  transition: border-color .15s, background .15s;
+}
+.algo-opt:active { border-color: var(--cyan); background: rgba(76,175,125,.1); }
+.algo-opt-txt { line-height: 1.4; }
 
 /* scroll */
 ::-webkit-scrollbar { width: 4px; }
@@ -1231,11 +1248,242 @@ function eliminarPaciente(id) {
 
 function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
 
+
+// ════════════════════════════════════════
+// ALGORITMO CLASIFICADOR
+// ════════════════════════════════════════
+const ALGO = {
+  start: {
+    txt: "¿Dónde está localizada la lesión?",
+    icon: "📍",
+    opts: [
+      { label: "Prominencia ósea (sacro, talón, cadera, codo)", next: "upp_confirm" },
+      { label: "Maléolo interno / tercio distal de la pierna", next: "venosa_confirm" },
+      { label: "Dedos, zonas distales del pie, talón (sin presión)", next: "dolor_arterial" },
+      { label: "Planta del pie / puntos de carga", next: "diabetica_confirm" },
+      { label: "Zona quirúrgica / incisión", next: "quirurgica_confirm" },
+      { label: "Traumatismo, abrasión, quemadura", next: "traumatica_confirm" }
+    ]
+  },
+  upp_confirm: {
+    txt: "¿El paciente tiene movilidad reducida o está encamado/en silla?",
+    icon: "🛏️",
+    opts: [
+      { label: "Sí, inmovilidad presente", next: "upp_estadio" },
+      { label: "No, deambula con normalidad", next: "revisar" }
+    ]
+  },
+  upp_estadio: {
+    txt: "¿Cómo es la lesión?",
+    icon: "🔎",
+    opts: [
+      { label: "Eritema que no palidece, piel íntegra", next: "resultado_upp1" },
+      { label: "Ampolla, abrasión o erosión superficial", next: "resultado_upp2" },
+      { label: "Pérdida total del grosor de la piel", next: "resultado_upp3" },
+      { label: "Afecta músculo, tendón u hueso", next: "resultado_upp4" }
+    ]
+  },
+  venosa_confirm: {
+    txt: "¿Cómo es el dolor y el aspecto de la pierna?",
+    icon: "🦵",
+    opts: [
+      { label: "Poco dolor o mejora al elevar la pierna + edema + piel ocre/engrosada", next: "resultado_venosa" },
+      { label: "Dolor intenso que empeora en reposo o al elevar + piel fría", next: "dolor_arterial" }
+    ]
+  },
+  dolor_arterial: {
+    txt: "¿Cómo son los pulsos pedios y la piel distal?",
+    icon: "❄️",
+    opts: [
+      { label: "Pulsos débiles o ausentes + piel fría, pálida o cianótica", next: "resultado_arterial" },
+      { label: "Pulsos presentes + piel normal", next: "revisar" }
+    ]
+  },
+  diabetica_confirm: {
+    txt: "¿El paciente tiene diabetes diagnosticada?",
+    icon: "🦶",
+    opts: [
+      { label: "Sí", next: "diabetica_dolor" },
+      { label: "No, pero hay callosidad y deformidad", next: "diabetica_dolor" },
+      { label: "No y sin deformidad", next: "revisar" }
+    ]
+  },
+  diabetica_dolor: {
+    txt: "¿Hay dolor en la lesión?",
+    icon: "😶",
+    opts: [
+      { label: "No duele (neuropatía probable)", next: "resultado_diabetica" },
+      { label: "Sí duele + pulsos débiles", next: "resultado_arterial" },
+      { label: "Sí duele levemente", next: "resultado_diabetica" }
+    ]
+  },
+  quirurgica_confirm: {
+    txt: "¿Cuándo fue la intervención y cómo está la herida?",
+    icon: "🏥",
+    opts: [
+      { label: "Herida reciente, bordes aproximados, cicatrizando", next: "resultado_quirurgica" },
+      { label: "Herida dehiscente o con exudado", next: "resultado_quirurgica" }
+    ]
+  },
+  traumatica_confirm: {
+    txt: "¿Cuál es el mecanismo?",
+    icon: "🩹",
+    opts: [
+      { label: "Abrasión, laceración, contusión", next: "resultado_traumatica" },
+      { label: "Quemadura térmica o química", next: "resultado_quemadura" }
+    ]
+  },
+  revisar: {
+    txt: "El patrón no es típico de una sola categoría. Se recomienda:",
+    icon: "⚠️",
+    opts: [
+      { label: "Valorar ITB (Índice Tobillo-Brazo) si hay dudas vasculares", next: "itb_info" },
+      { label: "Consultar con unidad de heridas o vascular", next: "resultado_revisar" }
+    ]
+  },
+  itb_info: {
+    txt: "Índice Tobillo-Brazo (ITB): ¿cuál es el resultado?",
+    icon: "📏",
+    opts: [
+      { label: "ITB < 0,9 → Enfermedad arterial", next: "resultado_arterial" },
+      { label: "ITB 0,9–1,3 → Normal (descarta arterial grave)", next: "resultado_venosa" },
+      { label: "ITB > 1,3 → Calcificación (frecuente en diabéticos)", next: "resultado_diabetica" }
+    ]
+  },
+  // RESULTADOS
+  resultado_upp1: { resultado: true, tipo: "upp", label: "UPP Estadio I", color: "#4CAF7D",
+    desc: "Eritema no blanqueable en piel íntegra. Iniciar medidas de alivio de presión urgentes. Aplicar AGHO + película de poliuretano.",
+    alertas: [] },
+  resultado_upp2: { resultado: true, tipo: "upp", label: "UPP Estadio II", color: "#F57F17",
+    desc: "Pérdida parcial del grosor dérmico. Ampolla o erosión superficial. Cura en ambiente húmedo: hidrocoloide o espuma poliuretano.",
+    alertas: ["Vigilar infección", "Evitar presión sobre la zona"] },
+  resultado_upp3: { resultado: true, tipo: "upp", label: "UPP Estadio III", color: "#C62828",
+    desc: "Pérdida total del grosor de la piel. Puede verse tejido subcutáneo. Desbridamiento si esfacelos. Seguimiento estrecho.",
+    alertas: ["UPP estadio III → seguimiento estrecho", "Valorar derivación"] },
+  resultado_upp4: { resultado: true, tipo: "upp", label: "UPP Estadio IV", color: "#B71C1C",
+    desc: "Pérdida total tisular con exposición de hueso, tendón o músculo. Requiere valoración especializada urgente.",
+    alertas: ["🚨 UPP estadio IV → derivación urgente", "Riesgo de osteomielitis"] },
+  resultado_venosa: { resultado: true, tipo: "venosa", label: "Úlcera Venosa", color: "#1565C0",
+    desc: "Localización maleolar interna, exudado abundante, bordes irregulares, piel ocre. Terapia de compresión (si ITB > 0,8) + apósitos absorbentes.",
+    alertas: ["⚠️ Si ITB < 0,8 → NO comprimir sin valoración vascular", "Controlar edema"] },
+  resultado_arterial: { resultado: true, tipo: "arterial", label: "Úlcera Arterial", color: "#880E4F",
+    desc: "Pulsos débiles/ausentes. Fondo seco o necrótico, poco exudado. Piel fría. Derivación preferente a cirugía vascular.",
+    alertas: ["🚨 Sospecha arterial → derivación preferente", "NO comprimir", "Valorar ITB urgente"] },
+  resultado_diabetica: { resultado: true, tipo: "diabetico", label: "Pie Diabético", color: "#4527A0",
+    desc: "Planta del pie, sin dolor (neuropatía), rodeada de callosidad, frecuente infección. Desbridamiento + control glucémico + descarga.",
+    alertas: ["🚨 Pie diabético infectado → urgencia", "Valorar vascularización", "Descargar la zona"] },
+  resultado_quirurgica: { resultado: true, tipo: "quirurgica", label: "Herida Quirúrgica", color: "#007A3D",
+    desc: "Herida postoperatoria. Limpiar y proteger. Si dehiscencia: cura en ambiente húmedo. Vigilar signos de infección.",
+    alertas: ["Vigilar dehiscencia", "Control de infección local"] },
+  resultado_traumatica: { resultado: true, tipo: "traumatica", label: "Herida Traumática", color: "#00695C",
+    desc: "Limpieza exhaustiva. Apósito mallado de parafina o film poliuretano si superficial. Valorar sutura si borde limpio.",
+    alertas: ["Profilaxis antitetánica si procede"] },
+  resultado_quemadura: { resultado: true, tipo: "quemadura", label: "Quemadura", color: "#E65100",
+    desc: "Enfriamiento inmediato. Apósito mallado de parafina (Urgotul), film o apósito de plata si riesgo de infección. Valorar profundidad.",
+    alertas: ["⚠️ Quemadura > 10% o cara/manos → derivación urgente", "Primer escalón: sulfadiazina argéntica"] },
+  resultado_revisar: { resultado: true, tipo: null, label: "Herida atípica / mixta", color: "#607D6B",
+    desc: "Patrón no encuadrable en una sola categoría. Se recomienda valoración por enfermera experta en heridas o unidad especializada.",
+    alertas: ["Solicitar valoración especializada"] }
+};
+
+let algoHistory = [];
+
+function abrirAlgoritmo() {
+  algoHistory = [];
+  renderAlgoPaso('start');
+  document.getElementById('modal-algoritmo').classList.remove('hidden');
+}
+
+function renderAlgoPaso(key) {
+  const paso = ALGO[key];
+  const el = document.getElementById('algo-content');
+
+  if (paso.resultado) {
+    // Resultado final
+    const alertasHtml = paso.alertas.map(a =>
+      `<div class="alert-warn" style="margin:6px 0">${a}</div>`
+    ).join('');
+    el.innerHTML = `
+      <div style="text-align:center;padding:16px 0 10px">
+        <div style="font-size:40px;margin-bottom:8px">✅</div>
+        <div style="font-size:20px;font-weight:700;color:${paso.color};margin-bottom:6px">${paso.label}</div>
+        <div style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:14px">${paso.desc}</div>
+        ${alertasHtml}
+      </div>
+      <button class="btn-primary" onclick="seleccionarTipoDesdeAlgo('${paso.tipo || ''}','${paso.label}')">
+        Usar esta clasificación en el selector
+      </button>
+      <button class="btn-secondary" onclick="reiniciarAlgo()">🔄 Volver a clasificar</button>
+      ${algoHistory.length > 0 ? `<button class="btn-secondary" onclick="retroAlgo()">← Paso anterior</button>` : ''}
+    `;
+    return;
+  }
+
+  const optsHtml = paso.opts.map((opt, i) => `
+    <button class="algo-opt" onclick="avanzarAlgo('${opt.next}')">
+      <span class="algo-opt-txt">${opt.label}</span>
+      <span style="color:var(--cyan);font-size:16px">›</span>
+    </button>
+  `).join('');
+
+  el.innerHTML = `
+    <div style="text-align:center;font-size:28px;margin-bottom:10px">${paso.icon}</div>
+    <div style="font-size:15px;font-weight:600;color:var(--white);margin-bottom:16px;line-height:1.4">${paso.txt}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">${optsHtml}</div>
+    ${algoHistory.length > 0 ? `<button class="btn-secondary" style="margin-top:14px" onclick="retroAlgo()">← Paso anterior</button>` : ''}
+    <div style="margin-top:8px;font-size:11px;color:var(--gray2);text-align:center">Paso ${algoHistory.length + 1}</div>
+  `;
+}
+
+function avanzarAlgo(nextKey) {
+  const el = document.getElementById('algo-content');
+  // Guardar estado actual para retroceder
+  algoHistory.push(nextKey);
+  renderAlgoPaso(nextKey);
+}
+
+function retroAlgo() {
+  algoHistory.pop();
+  const prev = algoHistory.length > 0 ? algoHistory[algoHistory.length - 1] : 'start';
+  algoHistory.pop();
+  renderAlgoPaso(prev);
+}
+
+function reiniciarAlgo() {
+  algoHistory = [];
+  renderAlgoPaso('start');
+}
+
+function seleccionarTipoDesdeAlgo(tipo, label) {
+  closeModal('modal-algoritmo');
+  if (!tipo) return;
+  // Marcar el chip correspondiente en el selector
+  sel.tipo = tipo;
+  document.querySelectorAll('#chips-tipo .chip').forEach(c => {
+    c.classList.remove('selected');
+    // Buscar el chip cuyo tipo coincide
+  });
+  // Rebuild chips con selección
+  const container = document.getElementById('chips-tipo');
+  container.querySelectorAll('.chip:not(.chip-clasif)').forEach(c => {
+    const itemKey = TIPOS_HERIDA.find(t => t.label === c.textContent)?.key;
+    if (itemKey === tipo) c.classList.add('selected');
+  });
+  updateResultados();
+}
+
 // ════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════
 function initApp() {
   buildChips("chips-tipo", TIPOS_HERIDA, "tipo");
+  // Añadir chip especial clasificador
+  const chipsContainer = document.getElementById("chips-tipo");
+  const btnClasif = document.createElement("button");
+  btnClasif.className = "chip chip-clasif";
+  btnClasif.innerHTML = "🔍 Ayúdame a clasificar";
+  btnClasif.onclick = () => abrirAlgoritmo();
+  chipsContainer.appendChild(btnClasif);
   buildChips("chips-tejido", TEJIDOS, "tejido");
   buildChips("chips-exudado", EXUDADOS, "exudado");
   buildChips("chips-infeccion", INFECCION, "infeccion");
@@ -1251,5 +1499,14 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 </script>
+
+<!-- MODAL ALGORITMO CLASIFICADOR -->
+<div id="modal-algoritmo" class="modal-overlay hidden">
+  <div class="modal-sheet" style="max-height:92vh">
+    <button class="modal-close" onclick="closeModal('modal-algoritmo')">✕</button>
+    <div class="modal-title">🔍 Clasificador de heridas</div>
+    <div id="algo-content"></div>
+  </div>
+</div>
 </body>
 </html>
