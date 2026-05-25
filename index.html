@@ -393,7 +393,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- VIEW: PACIENTES -->
     <div class="view" id="view-pacientes">
-      <button class="btn-primary" onclick="showModalNuevoPaciente()" style="margin-bottom:16px">+ Nuevo paciente</button>
+      <div class="alert-warn" style="margin-bottom:12px;font-size:12px">⚠️ Usa solo identificadores numéricos. No introduzcas nombres, fechas de nacimiento ni ningún dato personal identificativo.</div>
+      <button class="btn-primary" onclick="showModalNuevoPaciente()" style="margin-bottom:16px">+ Nuevo registro</button>
       <div id="lista-pacientes"></div>
     </div>
 
@@ -429,31 +430,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div id="modal-paciente" class="modal-overlay hidden">
   <div class="modal-sheet">
     <button class="modal-close" onclick="closeModal('modal-paciente')">✕</button>
-    <div class="modal-title" id="modal-pac-title">Nuevo paciente</div>
-    <div class="flex-row">
-      <div class="form-group">
-        <label class="form-label">Nombre</label>
-        <input id="f-nombre" class="form-input" type="text" placeholder="Nombre">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Apellidos</label>
-        <input id="f-apellidos" class="form-input" type="text" placeholder="Apellidos">
-      </div>
+    <div class="modal-title" id="modal-pac-title">Nuevo registro</div>
+    <div class="alert-warn" style="margin-bottom:14px;font-size:12px">
+      ⚠️ <strong>No introduzcas datos identificativos.</strong> Usa solo un código numérico o referencia interna. Esta app no está homologada para almacenar datos de salud personales.
     </div>
-    <div class="flex-row">
-      <div class="form-group">
-        <label class="form-label">Edad</label>
-        <input id="f-edad" class="form-input" type="number" placeholder="Años">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Sexo</label>
-        <select id="f-sexo" class="form-input">
-          <option value="">--</option>
-          <option>Mujer</option>
-          <option>Hombre</option>
-          <option>No especificado</option>
-        </select>
-      </div>
+    <div class="form-group">
+      <label class="form-label">Identificador numérico / Código interno</label>
+      <input id="f-nombre" class="form-input" type="text" placeholder="Ej: 0042, HC-2024-01...">
     </div>
     <div class="form-group">
       <label class="form-label">Tipo de herida principal</label>
@@ -1110,8 +1093,8 @@ function renderPacientes() {
     const resvStr = ult ? `RESVECH ${ult.resvechTotal}` : "";
     return `
     <div class="paciente-card" onclick="verPaciente('${p.id}')">
-      <div class="pac-name">${p.nombre} ${p.apellidos}</div>
-      <div class="pac-meta">${p.edad ? p.edad + " años · " : ""}${p.tipo || ""}</div>
+      <div class="pac-name">🔢 ${p.nombre}</div>
+      <div class="pac-meta">${p.tipo || "Tipo no especificado"}</div>
       <div class="pac-meta">${p.localizacion || ""}</div>
       <div class="pac-badges">
         <span class="card-badge badge-blue">${pushStr}</span>
@@ -1126,8 +1109,9 @@ function showModalNuevoPaciente(id) {
   currentPacId = id || null;
   const pac = id ? pacientes.find(p=>p.id===id) : null;
   document.getElementById("modal-pac-title").textContent = pac ? "Editar paciente" : "Nuevo paciente";
-  ["nombre","apellidos","edad","sexo","tipo","localizacion","obs"].forEach(f => {
-    document.getElementById("f-"+f).value = pac ? (pac[f]||"") : "";
+  ["nombre","tipo","localizacion","obs"].forEach(f => {
+    const el = document.getElementById("f-"+f);
+    if (el) el.value = pac ? (pac[f]||"") : "";
   });
   document.getElementById("modal-paciente").classList.remove("hidden");
 }
@@ -1138,9 +1122,9 @@ function guardarPaciente() {
   const pac = {
     id: currentPacId || Date.now().toString(),
     nombre,
-    apellidos: document.getElementById("f-apellidos").value.trim(),
-    edad: document.getElementById("f-edad").value,
-    sexo: document.getElementById("f-sexo").value,
+    apellidos: "",
+    edad: "",
+    sexo: "",
     tipo: document.getElementById("f-tipo").value,
     localizacion: document.getElementById("f-localizacion").value.trim(),
     obs: document.getElementById("f-obs").value.trim(),
@@ -1204,9 +1188,9 @@ function verPaciente(id) {
 
   document.getElementById("modal-detalle-content").innerHTML = `
     <button class="modal-close" onclick="closeModal('modal-detalle')">✕</button>
-    <div class="modal-title">${p.nombre} ${p.apellidos}</div>
+    <div class="modal-title">🔢 ${p.nombre}</div>
     <div class="alert-info" style="margin-bottom:12px">
-      ${p.edad ? p.edad+" años" : ""} ${p.sexo ? "· "+p.sexo : ""} ${p.tipo ? "· "+p.tipo : ""}<br>
+      ${p.tipo ? p.tipo : "Tipo no especificado"}<br>
       ${p.localizacion ? "📍 "+p.localizacion : ""}
       ${p.obs ? "<br>📋 "+p.obs : ""}
     </div>
