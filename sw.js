@@ -1,4 +1,4 @@
-const CACHE = 'curaguide-v2';
+const CACHE = 'curaguide-v1';
 const FILES = ['/', '/index.html'];
 
 self.addEventListener('install', e => {
