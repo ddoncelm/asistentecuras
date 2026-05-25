@@ -615,185 +615,193 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 // DATA
 // ════════════════════════════════════════
 const APOSITOS = [
-  // ÁCIDOS GRASOS
-  { nombre: "Ácidos Grasos Hiperoxigenados (AGHO)", gc: "Ver catálogo SAS", precio: "",
-    tejidos: ["granulacion","epitelizacion","piel_integra"],
-    exudados: ["nulo","ligero"],
+  // ── ÁCIDOS GRASOS HIPEROXIGENADOS ──
+  // Indicación real: PREVENCIÓN UPP y protección piel perilesional en riesgo
+  // NO es un apósito para heridas abiertas en epitelización quirúrgica
+  { nombre: "Ácidos Grasos Hiperoxigenados (AGHO)", gc: "Ver catálogo SAS",
+    tejidos: ["piel_integra"],
+    exudados: ["nulo"],
     infeccion: ["no"],
-    tipos: ["upp","venosa","arterial","diabetico","quirurgica","traumatica"],
-    desc: "Prevención de UPP. Protección de piel perilesional. Aplicar en zonas de riesgo y estadio I.",
-    obs: "Aplicar con suavidad. No usar sobre lesiones abiertas con exudado." },
+    tipos: ["upp"],
+    desc: "Prevención de UPP. Protección de piel perilesional sometida a presión. Aplicar en prominencias óseas y estadio I.",
+    obs: "No usar sobre lesiones abiertas. Exclusivo para prevención y estadio I UPP." },
 
-  // HIDROCOLOIDES
+  // ── HIDROCOLOIDE ──
+  // Heridas superficiales exudado nulo/ligero. NO en infectadas ni herida quirúrgica limpia en epitelización (no aporta sobre film)
   { nombre: "Hidrocoloide (Comfeel Plus / Varihesive)", gc: "GC E 64xxx",
     tejidos: ["granulacion","epitelizacion"],
     exudados: ["nulo","ligero"],
     infeccion: ["no"],
-    tipos: ["upp","venosa","quirurgica","traumatica"],
-    desc: "Lesiones superficiales con exudado nulo o escaso. Desbridamiento autolítico. Estadio II.",
-    obs: "No usar en heridas infectadas ni exudado abundante. Cambio cada 3-7 días." },
+    tipos: ["upp","venosa","traumatica"],
+    desc: "UPP estadio II, úlcera venosa superficial, herida traumática superficial. Desbridamiento autolítico. Exudado nulo o escaso.",
+    obs: "No usar en heridas infectadas ni quirúrgicas recientes. Cambio cada 3-7 días." },
 
-  // HIDROGEL AMORFO
+  // ── HIDROGEL AMORFO ──
+  // Desbridamiento autolítico. Necrosis y esfacelos secos. Requiere apósito secundario.
   { nombre: "Hidrogel Amorfo (Intrasite Gel)", gc: "GC E 64932",
     tejidos: ["necrosis","esfacelos"],
     exudados: ["nulo","ligero"],
     infeccion: ["no","si"],
-    tipos: ["upp","venosa","quirurgica","traumatica","diabetico"],
-    desc: "Desbridamiento autolítico y enzimático (con colagenasa). Hidratación del lecho. Regenera granulación.",
-    obs: "No asociar a antisépticos yodados ni clorhexidina. Precisa apósito secundario." },
+    tipos: ["upp","venosa","arterial","diabetico","traumatica"],
+    desc: "Desbridamiento autolítico de necrosis y esfacelos secos. Hidratación del lecho. Facilita desbridamiento enzimático con colagenasa.",
+    obs: "No asociar a antisépticos yodados ni clorhexidina. En herida infectada, usar siempre combinado con agente antimicrobiano (plata). Precisa apósito secundario absorbente." },
 
-  // HIDROFIBRA
+  // ── HIDROFIBRA ──
+  // Heridas muy exudativas: UPP, venosas, pie diabético. NO en quirúrgica limpia.
   { nombre: "Hidrofibra (Aquacel Extra / Aquacel Cinta)", gc: "GC E64650 / E64543",
     tejidos: ["granulacion","esfacelos"],
     exudados: ["moderado","abundante"],
     infeccion: ["no","si"],
-    tipos: ["upp","venosa","diabetico","quirurgica"],
-    desc: "Heridas muy exudativas. Absorbe en sentido vertical evitando maceración. Cavidades y tunelizaciones.",
+    tipos: ["upp","venosa","diabetico"],
+    desc: "Heridas crónicas muy exudativas. Absorción vertical, evita maceración perilesional. Cavidades y tunelizaciones con formato cinta.",
     obs: "Rellenar cavidades solo al 80%. Precisa apósito secundario. No usar en necrosis seca." },
 
-  // HIDROFIBRA CON PLATA
+  // ── HIDROFIBRA CON PLATA ──
   { nombre: "Hidrofibra c/ Plata (Aquacel AG Extra)", gc: "GC E 64662",
     tejidos: ["granulacion","esfacelos"],
     exudados: ["moderado","abundante"],
     infeccion: ["si","riesgo"],
     tipos: ["upp","venosa","diabetico","quirurgica"],
-    desc: "Colonización crítica o alto riesgo de infección. Gran capacidad de absorción + acción antimicrobiana.",
-    obs: "No asociar a colagenasa (se inactiva). Combinar con carbón si hay olor. Máx. 2 semanas." },
+    desc: "Colonización crítica o infección en heridas muy exudativas. Gran absorción + acción antimicrobiana de plata.",
+    obs: "No asociar a colagenasa (la inactiva). Combinar con carbón si hay olor. Máx. 2 semanas continuas." },
 
-  // ALGINATO
+  // ── ALGINATO ──
   { nombre: "Alginato (Urgosorb 10×10)", gc: "GC E 64880",
     tejidos: ["granulacion","esfacelos"],
     exudados: ["moderado","abundante"],
     infeccion: ["no","si"],
     tipos: ["upp","venosa","diabetico","quirurgica"],
-    desc: "Gran absorción. Hemostático. Regenera tejido de granulación. Lesiones exudativas y cavitadas.",
-    obs: "Evita maceración periulceral. Precisa apósito secundario. Cambio cada 2-3 días según exudado." },
+    desc: "Heridas crónicas exudativas y cavitadas. Gran absorción. Acción hemostática. Regenera tejido de granulación.",
+    obs: "Precisa apósito secundario. Cambio cada 2-3 días según nivel de exudado." },
 
-  // ESPUMA POLIURETANO SIN ADHESIVO
+  // ── ESPUMA POLIURETANO NO ADHESIVO ──
   { nombre: "Espuma Poliuretano NO adhesivo (Biatain / Mepilex)", gc: "GC E64945 / E65063",
     tejidos: ["granulacion","epitelizacion"],
     exudados: ["moderado","abundante"],
     infeccion: ["no"],
     tipos: ["upp","venosa","diabetico","quirurgica","traumatica"],
-    desc: "Granulación y epitelización. Absorción de exudado moderado-abundante. Apósito secundario.",
+    desc: "Absorción de exudado moderado-abundante en heridas en granulación o epitelización. Apósito secundario o principal sin adhesivo.",
     obs: "Puede permanecer hasta 7 días o hasta saturación visible a 2 cm del borde." },
 
-  // ESPUMA POLIURETANO CON ADHESIVO
+  // ── ESPUMA POLIURETANO ADHESIVO ──
   { nombre: "Espuma Poliuretano adhesivo (Mepilex Borde / Biatain Adhesivo)", gc: "GC E64314 / E65566",
     tejidos: ["granulacion","epitelizacion"],
     exudados: ["ligero","moderado"],
     infeccion: ["no"],
     tipos: ["upp","venosa","quirurgica","traumatica"],
-    desc: "Lesiones superficiales o profundas. Prevención sobre prominencias óseas. Todo tipo cicatrización 2ª intención.",
-    obs: "Con silicona: atraumático en piel frágil. Inspeccionar c/72h en infectadas." },
+    desc: "Heridas en granulación o epitelización con exudado ligero-moderado. Prevención sobre prominencias óseas. Bordes adhesivos de silicona.",
+    obs: "Atraumático en piel frágil gracias a la silicona. Inspeccionar c/72h si hay sospecha de infección." },
 
-  // ESPUMA c/ PLATA (Mepilex Borde AG)
+  // ── ESPUMA CON PLATA ──
   { nombre: "Espuma c/ Plata (Mepilex Borde AG / Biatain AG)", gc: "GC E71905 / E65193",
     tejidos: ["granulacion","esfacelos"],
     exudados: ["moderado","abundante"],
     infeccion: ["si","riesgo"],
     tipos: ["upp","venosa","diabetico","quirurgica"],
-    desc: "Colonización crítica o infección. Espuma absorbente con plata antimicrobiana + bordes adhesivos.",
-    obs: "No asociar a colagenasa. Usar asociado a carbón si hay olor percibido." },
+    desc: "Colonización crítica o infección en heridas exudativas. Espuma absorbente + plata antimicrobiana.",
+    obs: "No asociar a colagenasa. Usar con carbón activado si hay olor percibido." },
 
-  // ESPUMA TALÓN
+  // ── ESPUMA TALÓN/CODO ──
+  // Solo UPP en localización específica
   { nombre: "Espuma talón/codo (Allvyn Heel)", gc: "GC E 67980",
     tejidos: ["granulacion","epitelizacion","piel_integra"],
     exudados: ["nulo","ligero","moderado"],
     infeccion: ["no"],
     tipos: ["upp"],
-    desc: "Específico para talón/codo. Forma anatómica. Prevención y tratamiento de UPP en estas localizaciones.",
-    obs: "No adhesivo. Fijar con venda o malla tubular." },
+    desc: "Específico para UPP en talón o codo. Forma anatómica. Prevención y tratamiento en estas localizaciones.",
+    obs: "No adhesivo. Fijar con venda tubular o malla." },
 
-  // POLIACRILATO
+  // ── POLIACRILATO ──
   { nombre: "Poliacrilato (Urgoclean / Urgoclean Mecha)", gc: "GC E64737 / E64738",
     tejidos: ["esfacelos","necrosis"],
     exudados: ["moderado","abundante"],
     infeccion: ["no","si"],
     tipos: ["upp","venosa","diabetico","quirurgica","traumatica"],
-    desc: "Desbridamiento de heridas exudativas con fibrina. Gran absorción. Hemostático. Formato cinta para cavidades.",
-    obs: "Cambio cada 24-48h en desbridamiento. Se retira de una sola pieza." },
+    desc: "Desbridamiento mecánico suave de heridas con fibrina y esfacelos. Gran absorción. Formato mecha para cavidades.",
+    obs: "Cambio cada 24-48h en fase de desbridamiento. Se retira en una sola pieza." },
 
-  // CADEXÓMERO YODADO (Iodosorb)
+  // ── CADEXÓMERO YODADO ──
   { nombre: "Cadexómero yodado (Iodosorb)", gc: "GC D66569",
     tejidos: ["esfacelos","necrosis","granulacion"],
     exudados: ["moderado","abundante"],
     infeccion: ["si","riesgo"],
     tipos: ["upp","venosa","diabetico"],
-    desc: "Absorbe exudado. Desbridamiento y eficaz frente a biofilm. Gelifica en contacto con la herida.",
-    obs: "No usar en necrosis seca, niños, embarazadas, patología tiroidea o renal. Cambio al decolorar." },
+    desc: "Absorbe exudado y desbridamiento. Eficaz frente a biofilm. Gelifica en contacto con la herida liberando yodo de forma sostenida.",
+    obs: "No usar en necrosis seca, niños menores de 2 años, embarazadas, lactancia, patología tiroidea o renal grave. No en cavidades profundas ni heridas muy secas. Cambiar cuando decolora (pierde eficacia)." },
 
-  // APÓSITO CON CARBÓN
+  // ── CARBÓN ACTIVADO ──
   { nombre: "Apósito con Carbón Activado", gc: "Ver catálogo SAS",
     tejidos: ["granulacion","esfacelos","necrosis"],
     exudados: ["moderado","abundante"],
     infeccion: ["si"],
     tipos: ["upp","venosa","diabetico","quirurgica"],
-    desc: "Control del mal olor en heridas infectadas. Asociar a apósito con plata si hay colonización crítica.",
-    obs: "No recortar. Cambio cada 3-5 días o según saturación." },
+    desc: "Control del mal olor en heridas infectadas o con colonización crítica. Asociar a apósito con plata.",
+    obs: "No recortar el apósito. Cambio cada 3-5 días o según saturación." },
 
-  // DESBRIDANTE ENZIMÁTICO
-  { nombre: "Desbridante enzimático (RYM Colagenasa)", gc: "GC F34403",
+  // ── DESBRIDANTE ENZIMÁTICO ──
+  { nombre: "Desbridante enzimático (Colagenasa RYM)", gc: "GC F34403",
     tejidos: ["necrosis","esfacelos"],
     exudados: ["nulo","ligero"],
     infeccion: ["no"],
     tipos: ["upp","venosa","diabetico","arterial"],
-    desc: "Úlceras crónicas con necrosis/esfacelos. Ácido hialurónico + colagenasa. Suavizar escaras duras previamente.",
-    obs: "No usar con plata, jabones con amonio cuaternario ni antisépticos con metales pesados. Capa mínima." },
+    desc: "Úlceras crónicas con necrosis o esfacelos y exudado escaso. Colagenasa + ácido hialurónico. Suavizar escara dura previamente.",
+    obs: "Incompatible con plata, amonio cuaternario y antisépticos con metales pesados. No usar en herida infectada sin control previo de la infección. Aplicar capa mínima exclusivamente sobre tejido desvitalizado, protegiendo piel perilesional." },
 
-  // APÓSITO MALLADO PARAFINA
+  // ── APÓSITO MALLADO PARAFINA ──
+  // Solo heridas traumáticas, quemaduras y zonas donantes. No en crónicas.
   { nombre: "Apósito mallado parafina (Urgotul Flex)", gc: "GC E65894",
     tejidos: ["granulacion","epitelizacion"],
     exudados: ["nulo","ligero"],
     infeccion: ["no"],
-    tipos: ["traumatica","quemadura","quirurgica"],
-    desc: "Lesiones superficiales traumáticas, erosivas, quemaduras, zonas donantes. Reduce dolor en retirada.",
-    obs: "Precisa apósito de cierre secundario. Si se usan antisépticos antes, aclarar bien." },
+    tipos: ["traumatica","quemadura"],
+    desc: "Heridas traumáticas superficiales, erosiones, quemaduras y zonas donantes de injerto. Reduce dolor en la retirada del apósito.",
+    obs: "Precisa apósito secundario absorbente. Si se usan antisépticos previos, aclarar bien antes de aplicar." },
 
-  // PELÍCULA POLIURETANO
-  { nombre: "Película/Film Poliuretano (Fixomull / Open Film / Nobecutan)", gc: "GC D85480 / E64751 / E65241",
+  // ── PELÍCULA / FILM POLIURETANO ──
+  // Protección y fijación. NO como apósito primario de herida abierta exudativa.
+  { nombre: "Film de Poliuretano (Fixomull / Open Film / Nobecutan)", gc: "GC D85480 / E64751 / E65241",
     tejidos: ["piel_integra","epitelizacion"],
     exudados: ["nulo"],
     infeccion: ["no"],
-    tipos: ["upp","venosa","traumatica","quirurgica"],
-    desc: "Protección piel perilesional. Prevención UPP estadio I. Fijación apósitos. Transparente: permite ver la herida.",
-    obs: "Aplicar en piel seca y limpia. Impermeable al agua. Radiotransparente." },
+    tipos: ["upp","quirurgica","traumatica"],
+    desc: "Protección de piel perilesional. Herida quirúrgica superficial limpia en epitelización. Fijación de apósitos. Transparente: permite inspección.",
+    obs: "Solo exudado nulo. Aplicar en piel seca y limpia. Impermeable al agua. Radiotransparente." },
 
-  // PRODUCTOS BARRERA
-  { nombre: "Crema / Líquido barrera (Cutimed Protect / Askina Barrier)", gc: "GC E77384 / D66658",
-    tejidos: ["piel_integra","epitelizacion"],
-    exudados: ["nulo","ligero"],
+  // ── BARRERA CUTÁNEA ──
+  { nombre: "Crema/Líquido barrera (Cutimed Protect / Askina Barrier)", gc: "GC E77384 / D66658",
+    tejidos: ["piel_integra"],
+    exudados: ["nulo"],
     infeccion: ["no"],
     tipos: ["upp","venosa","diabetico","traumatica","quemadura"],
-    desc: "Protección piel perilesional. Previene maceración. Barrera frente a humedad, incontinencia y fricción.",
-    obs: "Protección hasta 96h. Dejar secar 1 min. No usar en quemaduras III grado ni con infección." },
+    desc: "Protección de piel perilesional frente a humedad, incontinencia y maceración. No actúa sobre la herida en sí.",
+    obs: "Protección hasta 96h. Dejar secar 1 minuto. No aplicar sobre heridas abiertas ni infección activa." },
 
-  // SILICONA (Mepitel)
+  // ── APÓSITO SILICONADO ──
   { nombre: "Apósito siliconado (Mepitel / Silflex)", gc: "Ver catálogo SAS",
     tejidos: ["granulacion","epitelizacion"],
     exudados: ["nulo","ligero"],
     infeccion: ["no"],
     tipos: ["traumatica","quemadura","quirurgica"],
-    desc: "Piel frágil, lesiones dolorosas. Atraumático en la retirada. Heridas superficiales en pacientes con fragilidad cutánea.",
-    obs: "Precisa apósito secundario absorbente según exudado." },
+    desc: "Piel frágil y lesiones dolorosas. Heridas superficiales en pacientes con fragilidad cutánea. Atraumático en la retirada.",
+    obs: "Precisa apósito secundario absorbente según nivel de exudado." },
 
-  // BIOACTIVOS / COLÁGENO
-  { nombre: "Colágeno / Moduladores proteasas (Promogran / Urgostart Plus)", gc: "GC E69620",
+  // ── COLÁGENO / MODULADORES DE PROTEASAS ──
+  { nombre: "Colágeno / Moduladores de proteasas (Promogran / Urgostart Plus)", gc: "GC E69620",
     tejidos: ["granulacion"],
     exudados: ["nulo","ligero","moderado"],
     infeccion: ["no"],
     tipos: ["upp","venosa","diabetico"],
-    desc: "Heridas estancadas sin signos de colonización. Segundo escalón cuando no mejora. Cronificación fase inflamatoria.",
-    obs: "No usar si hay infección activa. Evaluación a las 2-4 semanas." },
+    desc: "Heridas crónicas estancadas sin infección activa. Segundo escalón cuando no hay progresión. Cronificación de la fase inflamatoria.",
+    obs: "No usar con infección activa. Reevaluar a las 2-4 semanas de uso." },
 
-  // TERAPIA PRESIÓN NEGATIVA
+  // ── TERAPIA DE PRESIÓN NEGATIVA ──
   { nombre: "Terapia de Presión Negativa (SIMEX / PICO)", gc: "GC D45745 / F27904",
     tejidos: ["granulacion","esfacelos"],
-    exudados: ["abundante"],
+    exudados: ["moderado","abundante"],
     infeccion: ["no"],
     tipos: ["upp","venosa","diabetico","quirurgica"],
-    desc: "Facilita cicatrización retirando líquido extracelular y exudado. Reduce edema. Acelera granulación.",
-    obs: "No en úlceras neoplásicas. No en necrosis seca. Restricción a pacientes seleccionados." }
+    desc: "Facilita cicatrización retirando líquido extracelular y exudado. Reduce edema. Acelera formación de tejido de granulación.",
+    obs: "Contraindicado en úlceras neoplásicas y necrosis seca. Uso en pacientes seleccionados. Puede causar dolor al iniciar." }
 ];
 
 const TIPOS_HERIDA = [
@@ -875,6 +883,7 @@ function buildChips(containerId, items, selKey) {
     const b = document.createElement("button");
     b.className = "chip";
     b.textContent = item.label;
+    b.dataset.key = item.key;
     b.onclick = () => {
       if (sel[selKey] === item.key) { sel[selKey] = null; b.classList.remove("selected"); }
       else {
@@ -1318,21 +1327,32 @@ const ALGO = {
     ]
   },
   quirurgica_confirm: {
-    txt: "¿Cuándo fue la intervención y cómo está la herida?",
+    txt: "¿Cómo está la herida quirúrgica?",
     icon: "🏥",
     opts: [
-      { label: "Herida reciente, bordes aproximados, cicatrizando", next: "resultado_quirurgica" },
-      { label: "Herida dehiscente o con exudado", next: "resultado_quirurgica" }
+      { label: "Bordes aproximados, sin signos de infección, cicatrizando", next: "resultado_quirurgica" },
+      { label: "Dehiscencia o exudado sin signos de infección", next: "resultado_quirurgica_dehiscente" },
+      { label: "Signos de infección (calor, eritema, exudado purulento, fiebre)", next: "resultado_quirurgica_infectada" }
     ]
   },
+  resultado_quirurgica_dehiscente: { resultado: true, tipo: "quirurgica", label: "Herida Quirúrgica Dehiscente", color: "#F57F17",
+    desc: "Dehiscencia sin infección. Cura en ambiente húmedo: espuma de poliuretano o apósito absorbente según exudado. Limpieza con suero fisiológico.",
+    alertas: ["Vigilar aparición de signos de infección", "Valorar necesidad de resutura si dehiscencia amplia"] },
+  resultado_quirurgica_infectada: { resultado: true, tipo: "quirurgica", label: "Herida Quirúrgica Infectada", color: "#C62828",
+    desc: "Infección de herida quirúrgica. Limpieza exhaustiva + desbridamiento si precisa + apósito antimicrobiano (plata o cadexómero según exudado).",
+    alertas: ["🚨 Valorar antibiótico sistémico si celulitis o fiebre", "Cultivo si no responde en 48-72h", "Control glucémico si diabético"] },
   traumatica_confirm: {
-    txt: "¿Cuál es el mecanismo?",
+    txt: "¿Cuál es el mecanismo lesional?",
     icon: "🩹",
     opts: [
-      { label: "Abrasión, laceración, contusión", next: "resultado_traumatica" },
+      { label: "Abrasión, laceración o contusión limpia", next: "resultado_traumatica" },
+      { label: "Herida contaminada, mordedura o punzante", next: "resultado_traumatica_contaminada" },
       { label: "Quemadura térmica o química", next: "resultado_quemadura" }
     ]
   },
+  resultado_traumatica_contaminada: { resultado: true, tipo: "traumatica", label: "Herida Traumática Contaminada", color: "#E65100",
+    desc: "Limpieza exhaustiva con irrigación abundante a presión. NO cerrar de primera intención si hay contaminación importante. Apósito antimicrobiano.",
+    alertas: ["Profilaxis antitetánica según estado vacunal", "🚨 Mordedura: valorar profilaxis antibiótica (amoxicilina-clavulánico)", "Derivar a urgencias si mordedura de animal o herida muy contaminada"] },
   revisar: {
     txt: "El patrón no es típico de una sola categoría. Se recomienda:",
     icon: "⚠️",
@@ -1457,17 +1477,15 @@ function reiniciarAlgo() {
 function seleccionarTipoDesdeAlgo(tipo, label) {
   closeModal('modal-algoritmo');
   if (!tipo) return;
-  // Marcar el chip correspondiente en el selector
+  // Resetear selección anterior
+  sel = { tipo: null, tejido: null, exudado: null, infeccion: null };
+  // Limpiar todos los chips de todos los grupos
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  // Establecer tipo y marcar chip correcto por data-key
   sel.tipo = tipo;
-  document.querySelectorAll('#chips-tipo .chip').forEach(c => {
-    c.classList.remove('selected');
-    // Buscar el chip cuyo tipo coincide
-  });
-  // Rebuild chips con selección
   const container = document.getElementById('chips-tipo');
   container.querySelectorAll('.chip:not(.chip-clasif)').forEach(c => {
-    const itemKey = TIPOS_HERIDA.find(t => t.label === c.textContent)?.key;
-    if (itemKey === tipo) c.classList.add('selected');
+    if (c.dataset.key === tipo) c.classList.add('selected');
   });
   updateResultados();
 }
